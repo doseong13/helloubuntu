@@ -4,16 +4,22 @@ services:
     container_name: helloubuntu
     ports:
       - "8080:8080"
+    environment:
+      DB_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE}
+      DB_USERNAME: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+    depends_on:
+      - db
     restart: unless-stopped
 
   db:
     image: mysql:8.4
     container_name: helloubuntu-db
     environment:
-      MYSQL_DATABASE: hellodb
-      MYSQL_USER: hello
-      MYSQL_PASSWORD: hello1234
-      MYSQL_ROOT_PASSWORD: root1234
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - mysql-data:/var/lib/mysql
     restart: unless-stopped
