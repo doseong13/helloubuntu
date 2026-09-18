@@ -1,0 +1,37 @@
+name: Deploy to Ubuntu
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v4
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
+
+      - name: Deploy to Ubuntu server
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          UBUNTU_HOST: ${{ secrets.UBUNTU_HOST }}
+          UBUNTU_USER: ${{ secrets.UBUNTU_USER }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/github_actions
+          chmod 600 ~/.ssh/github_actions
+
+          ssh-keyscan "$UBUNTU_HOST" >> ~/.ssh/known_hosts
+
+          ssh -i ~/.ssh/github_actions "$UBUNTU_USER@$UBUNTU_HOST" << 'EOF'
+            cd ~/projects/helloubuntu
+            git pull origin main
+            ./gradlew build
+            docker compose up -d --build
+          EOF
