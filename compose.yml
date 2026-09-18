@@ -5,3 +5,18 @@ services:
     ports:
       - "8080:8080"
     restart: unless-stopped
+
+  db:
+    image: mysql:8.4
+    container_name: helloubuntu-db
+    environment:
+      MYSQL_DATABASE: hellodb
+      MYSQL_USER: hello
+      MYSQL_PASSWORD: hello1234
+      MYSQL_ROOT_PASSWORD: root1234
+    volumes:
+      - mysql-data:/var/lib/mysql
+    restart: unless-stopped
+
+volumes:
+  mysql-data:
