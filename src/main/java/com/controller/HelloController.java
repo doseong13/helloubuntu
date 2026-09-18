@@ -8,6 +8,6 @@ public class HelloController {
 
     @GetMapping("/")
     public String hello() {
-        return "Hello, Ubuntu! Version 2";
+        return "Hello, Ubuntu! Version 3";
     }
 }
